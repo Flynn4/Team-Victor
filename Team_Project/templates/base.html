@@ -13,18 +13,11 @@
 
 </head>
 
+
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark    ">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <!-- Image and text -->
-    <nav class="navbar navbar-dark bg-dark">
-        <a class="navbar-brand" href="{% url 'web:index' %}">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRRvYB2Gs3hJ8mOG28GDrHtRs-EdlzHo0nb6CYyWY2RcnofkVE1"
-                 width="30" height="30"
-                 class="d-inline-block align-top" alt="">
-            Game Rating
-        </a>
-    </nav>
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,11 +47,38 @@
                 <a class="nav-link" href="#" id="navbarContact">Contact</a>
             </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
+
     </div>
+
+
+    <nav class="navbar navbar-dark bg-dark" style="margin-right: 25%">
+        <a class="navbar-brand" href="{% url 'web:index' %}">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRRvYB2Gs3hJ8mOG28GDrHtRs-EdlzHo0nb6CYyWY2RcnofkVE1"
+                 width="30" height="30"
+                 class="d-inline-block align-top" alt="">
+            G-CRITIC
+        </a>
+    </nav>
+
+
+    <!-- Just an image -->
+    <nav class="navbar navbar-light bg-dark">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'images/user-icon.png' %}" width="30" height="30" alt="">
+        </a>
+    </nav>
+
+    <div style="float: right">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+
+        </div>
+
+    </div>
+
 </nav>
 
 <div class="container-fluid" style="margin-top: 10px; text-align: center">

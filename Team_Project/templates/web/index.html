@@ -14,16 +14,19 @@
 {% block content %}
 
     <iframe class="youtube-player" width="960" height="540"
-            src="http://www.youtube.com/embed/O2W0N3uKXmo" frameborder="0">
+            src="http://www.youtube.com/embed/{{ video.videoId }}" frameborder="0">
     </iframe>
     <div class="container-fluid">
-        <img src="/static/images/test.jpg" class="img-thumbnail" alt="Responsive image">
-        <img src="/static/images/test.jpg" class="img-thumbnail" alt="Responsive image">
-        <img src="/static/images/test.jpg" class="img-thumbnail" alt="Responsive image">
-        <img src="/static/images/test.jpg" class="img-thumbnail" alt="Responsive image">
-        <img src="/static/images/test.jpg" class="img-thumbnail" alt="Responsive image">
-        <img src="/static/images/test.jpg" class="img-thumbnail" alt="Responsive image">
+        {% for game in five_games %}
+            <a href="https://store.steampowered.com/app/{{ game.sku }}" target="_blank">
+            <img src="https://steamcdn-a.akamaihd.net/steam/apps/{{ game.sku }}/capsule_616x353.jpg"
+                 class="img-thumbnail" alt="{{ game.name }}">
+            </a>
+        {% endfor %}
     </div>
 
 {% endblock %}
 
+<script>
+
+</script>
