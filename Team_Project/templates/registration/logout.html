@@ -1,10 +1,16 @@
 {% extends 'base.html' %}
+
 {% block title_block %}
-Logged Out
+    Logged Out
 {% endblock %}
+
+{% block head %}
+    <meta http-equiv="refresh" content="1;{% url 'web:index' %}">
+{% endblock %}
+
 {% block content %}
-<h1>Logged Out</h1>
-<p>
-You have been successfully logged out. Thanks for spending time on Games!
-</p>
+    <h1>Signing out...</h1>
+    <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
 {% endblock %}

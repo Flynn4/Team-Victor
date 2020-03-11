@@ -3,11 +3,13 @@
 
 <html lang="en">
 <head>
+
     <title>
         {% block title %}
         {% endblock %}
     </title>
-
+    {% block head %}
+    {% endblock %}
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -18,8 +20,17 @@
 
 </head>
 
-<body>
+<style>
+    .navbar-user {
+        padding: 0;
+        margin: 0 auto;
+        width: 200px;
+        text-align: center;
+    }
+</style>
 
+
+<body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <!-- Image and text -->
 
@@ -28,20 +39,22 @@
         <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <nav class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
                 <a class="nav-link" href="{% url 'web:index' %}">Home <span class="sr-only">(current)</span></a>
             </li>
 
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
                     Games
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">RPG</a>
-                    <a class="dropdown-item" href="#">FPS</a>
+                    {% for category in categories %}
+                        <a class="dropdown-item" href="#">{{ category.name }}</a>
+                    {% endfor %}
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="#">Something else here</a>
                 </div>
@@ -52,10 +65,9 @@
             </li>
         </ul>
 
-    </div>
+    </nav>
 
-
-    <nav class="navbar navbar-dark bg-dark" style="margin-right: 25%">
+    <nav class="navbar-logo" style="margin-right: 20%">
         <a class="navbar-brand" href="{% url 'web:index' %}">
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRRvYB2Gs3hJ8mOG28GDrHtRs-EdlzHo0nb6CYyWY2RcnofkVE1"
                  width="30" height="30"
@@ -65,25 +77,24 @@
     </nav>
 
 
-    <!-- Just an image -->
+    <!-- User Part -->
     {% if user.is_authenticated %}
-        <nav class="navbar navbar-dark bg-dark">
+        <nav class="navbar-user">
           <span class="navbar-text">
             Hello! {{ user.username }}
           </span>
-        </nav>
-        <nav class="navbar navbar-dark bg-dark">
-            <a href="{% url 'auth_logout' %}" id="navbarLogout">
+        <a href="{% url 'auth_logout' %}" id="navbarLogout" style="margin-left: 20px">
         <span class="navbar-text">
             Logout</span></a>
         </nav>
     {% else %}
-        <nav class="navbar navbar-light bg-dark">
-            <a class="navbar-brand" href="{% url 'auth_login' %}">
+        <nav class="navbar-user">
+            <a class="navbar-brand" href="{% url 'auth_login' %}" style="margin-left: 100px">
                 <img src="{% static 'images/user-icon.png' %}" width="30" height="30" alt="">
             </a>
         </nav>
     {% endif %}
+
     <div style="float: right">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <form class="form-inline my-2 my-lg-0">
@@ -96,6 +107,7 @@
     </div>
 
 </nav>
+
 
 <div class="container-fluid" style="margin-top: 10px; text-align: center">
     {% block content %}
