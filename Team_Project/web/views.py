@@ -15,14 +15,16 @@ def index(request):
 
     # Show 5 games on home page
     five_games = []
-    gamesId = random.sample(range(0, len(games)), 5)
-    for i in gamesId:
-        five_games.append(games[i])
-    dict['five_games'] = five_games
+    if len(games) > 0:
+        gamesId = random.sample(range(0, len(games)), 5)
+        for i in gamesId:
+            five_games.append(games[i])
+        dict['five_games'] = five_games
 
     # Random show video from database
     videos = Video.objects.all()
-    i = random.randint(0, len(videos) - 1)
-    dict['video'] = videos[i]
+    if len(videos) > 0:
+        i = random.randint(0, len(videos) - 1)
+        dict['video'] = videos[i]
 
     return render(request, "web/index.html", dict)

@@ -17,15 +17,20 @@
 {% block content %}
 
     <div class="embed-responsive embed-responsive-16by9" style="max-width: 960px; text-align: center; margin: 0 auto;">
+    {% if video.videoId %}
         <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/{{ video.videoId }}?rel=0"
                 allowfullscreen></iframe>
+    {% else %}
+        <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/O2W0N3uKXmo?rel=0"
+                allowfullscreen></iframe>
+    {% endif %}
     </div>
 
 
     <div class="container-fluid">
         {% for game in five_games %}
             <a href="https://store.steampowered.com/app/{{ game.sku }}" target="_blank">
-                <img src="https://steamcdn-a.akamaihd.net/steam/apps/{{ game.sku }}/capsule_616x353.jpg"
+                <img src="https://steamcdn-a.akamaihd.net/steam/apps/{{ game.sku }}/header.jpg"
                      class="img-thumbnail" alt="{{ game.name }}">
             </a>
         {% endfor %}
