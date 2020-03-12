@@ -2,7 +2,7 @@ import random
 import urllib
 
 from django.shortcuts import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import *
 import requests
 import json
@@ -15,6 +15,7 @@ def index(request):
     dict = {}
     games = Game.objects.all()
     dict['games'] = Game.objects.all()
+    # Already used in template tags
     # dict['categories'] = Category.objects.filter(tag__game_id__lt=2)
 
     # Show 5 games on home page
@@ -69,3 +70,12 @@ def game_info(request, id):
 
 def game(request):
     return render(request, 'web/game.html')
+
+
+def search(request):
+    sku = request.POST['sku']
+    if len(sku) > 0:
+        return HttpResponse(sku)
+        # return redirect('/game/' + search)
+    else:
+        return HttpResponse('Enter Wrong!')
