@@ -48,15 +48,23 @@
                         <img src="https://steamcdn-a.akamaihd.net/steam/apps/{{ game.0.sku }}/header.jpg"
                              class="card-img-top">
                         <div class="card-body">
-                            <a href="https://store.steampowered.com/app/{{ game.1.url }}" target="_blank">
-                                <p class="card-text">{{ game.1.title }}</p>
-                            </a>
+                            {% if game.1 == None %}
+                                <a href="https://store.steampowered.com/app/{{ game.0.sku }}" target="_blank">
+                                    <p class="card-text">{{ game.0.name }}</p>
+                                </a>
+                            {% else %}
+                                <a href="{{ game.1.url }}" target="_blank">
+                                    <p class="card-text">{{ game.1.title }}</p>
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
     </div>
+    
+</div>
 
 {% endblock %}
 
