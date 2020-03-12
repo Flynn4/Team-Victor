@@ -4,7 +4,7 @@ from .models import *
 
 # Register your models here.
 class GameAdmin(admin.ModelAdmin):
-    list_display = ['name', 'sku', 'tags']
+    list_display = ['name', 'appid', 'tags']
 
 
 admin.site.register(Game, GameAdmin)

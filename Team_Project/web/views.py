@@ -32,7 +32,7 @@ def index(request):
         gamesId1 = random.sample(range(0, len(games)), 16)
         for j in gamesId1:
             url = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + str(
-                games[j].sku) + '&count=3&maxlength=300&format=json'
+                games[j].appid) + '&count=3&maxlength=300&format=json'
             api_news_request = requests.get(url)
             api_news = json.loads(api_news_request.content)
 
@@ -73,9 +73,9 @@ def game(request):
 
 
 def search(request):
-    sku = request.POST['sku']
-    if len(sku) > 0:
-        return HttpResponse(sku)
+    appid = request.POST['appid']
+    if len(appid) > 0:
+        return HttpResponse(appid)
         # return redirect('/game/' + search)
     else:
         return HttpResponse('Enter Wrong!')

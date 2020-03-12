@@ -44,8 +44,8 @@ def populate():
         add_video(k['name'], k['videoId'])
 
 
-def add_game(name, sku):
-    g = Game.objects.get_or_create(name=name, sku=sku)[0]
+def add_game(name, appid):
+    g = Game.objects.get_or_create(name=name, appid=appid)[0]
     g.save()
     return g
 
