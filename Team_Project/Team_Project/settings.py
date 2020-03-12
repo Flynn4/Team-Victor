@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'web',
     'registration',
+    'social_django',
 ]
 
 # If True, users can register.
@@ -77,6 +78,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -111,6 +114,17 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+# Authentication backends
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.github.GithubOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+# Auth Keys
+SOCIAL_AUTH_GITHUB_KEY = 'd10cf5b7da8b52c647dc'
+SOCIAL_AUTH_GITHUB_SECRET = '26e212923e40a4c0d686fd2afe6b5710d0f56915'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
