@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<style>
+    .table-hover{
+        cursor: pointer;
+    }
+</style>
+
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+    {{ tag }}
+{% endblock %}
+
+{% block content %}
+    <div class="container" style="width: 70%">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">No</th>
+                <th scope="col">Logo</th>
+                <th scope="col" width="50%">Name</th>
+                <th scope="col" width="10%">Appid</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for i in games %}
+                <tr onclick="location.href = '/game/{{ i.0 }}'" style="vertical-align: middle">
+                    <th scope="row" style="vertical-align: middle">{{ forloop.counter }}</th>
+                    <td><img src="https://steamcdn-a.akamaihd.net/steam/apps/{{ i.0 }}/header.jpg"
+                             class="card-img-top" style="width: 250px"></td>
+                    <td style="vertical-align: middle">{{ i.1 }}</td>
+                    <td style="vertical-align: middle">{{ i.0 }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+

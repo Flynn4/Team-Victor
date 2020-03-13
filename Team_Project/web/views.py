@@ -1,3 +1,4 @@
+import datetime
 import random
 import urllib
 
@@ -28,18 +29,24 @@ def index(request):
 
     # Show 16 games and news on home page
     games_news = []
+    gamesId = random.sample(range(0, len(games)), 50)
     if len(games) > 0:
-        gamesId1 = random.sample(range(0, len(games)), 16)
-        for j in gamesId1:
-            url = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + str(
-                games[j].appid) + '&count=3&maxlength=300&format=json'
-            api_news_request = requests.get(url)
-            api_news = json.loads(api_news_request.content)
-
-            if len(api_news['appnews']['newsitems']) > 0:
-                games_news.append((games[j], api_news['appnews']['newsitems'][0]))
+        count = 0
+        for j in gamesId:
+            if count == 16:
+                break
             else:
-                games_news.append((games[j], None))
+                url = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + str(games[j].appid) + '&count=3&maxlength=300&format=json'
+                api_news = requests.get(url).json()
+                if len(api_news['appnews']['newsitems']) > 0:
+                    timeStamp = api_news['appnews']['newsitems'][0]['date']
+                    dateArray = datetime.datetime.fromtimestamp(timeStamp)
+                    otherStyleTime = dateArray.strftime("%d %b %Y")
+                    api_news['appnews']['newsitems'][0]['date'] = otherStyleTime
+                    games_news.append(api_news['appnews']['newsitems'][0])
+                    count += 1
+                else:
+                    continue
 
         dict['games_news'] = games_news
 
@@ -54,12 +61,10 @@ def index(request):
 
 def game_info(request, id):
     url = 'https://steamspy.com/api.php?request=appdetails&appid=' + id
-    api_game_request = requests.get(url)
-    game = json.loads(api_game_request.content)
+    game = requests.get(url).json()
 
     url1 = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + id + '&count=3&maxlength=300&format=json'
-    api_news_request = requests.get(url1)
-    news = json.loads(api_news_request.content)
+    news = requests.get(url1).json()
 
     html = urllib.request.urlopen('https://store.steampowered.com/app/' + id).read()
     reg = r'https://steamcdn-a.akamaihd.net/steam/apps/' + id + '/ss_.+?.1920x1080.jpg'
@@ -99,3 +104,15 @@ def search(request):
         # return redirect('/game/' + search)
     else:
         return HttpResponse('Enter Wrong!')
+
+
+def category(request, cat):
+    dict = {}
+    cat = cat.replace('_', ' ')
+    game_name = Tag.objects.filter(category__name=cat).values('game__name')
+    game_appid = Tag.objects.filter(category__name=cat).values('game__appid')
+    games = []
+    for i in range(len(game_appid)):
+        games.append((game_appid[i]['game__appid'], game_name[i]['game__name']))
+
+    return render(request, 'web/category.html', {'tag': cat, 'games': games})

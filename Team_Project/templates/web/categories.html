@@ -1,3 +1,4 @@
+{% load web_template_tags %}
 {% for category in categories %}
-    <a class="dropdown-item" href="#">{{ category.name }}</a>
+    <a class="dropdown-item" href="/category/{{ category.name|spacify }}">{{ category.name }}</a>
 {% endfor %}
