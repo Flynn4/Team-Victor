@@ -33,7 +33,7 @@
 
     <div class="container-fluid" style="margin-top: 20px">
         {% for game in five_games %}
-            <a href="https://store.steampowered.com/app/{{ game.appid }}" target="_blank">
+            <a href="/game/{{ game.appid }}" target="_blank">
                 <img src="https://steamcdn-a.akamaihd.net/steam/apps/{{ game.appid }}/header.jpg"
                      class="img-thumbnail" alt="{{ game.name }}">
             </a>

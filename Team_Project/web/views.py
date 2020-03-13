@@ -4,6 +4,7 @@ import urllib
 from django.shortcuts import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
+from bs4 import BeautifulSoup
 import requests
 import json
 import re
@@ -65,7 +66,23 @@ def game_info(request, id):
     reg = r'https://steamcdn-a.akamaihd.net/steam/apps/' + id + '/ss_.+?.1920x1080.jpg'
     imglist = re.findall(reg, html.decode('utf-8'))
 
-    return render(request, 'web/game_info.html', {'game': game, 'news': news, 'img': imglist})
+    soup = BeautifulSoup(html, 'lxml')
+    description = soup.find(attrs={"name": "Description"})['content']
+
+    area_description = str(soup.find_all(id='game_area_description')).replace('[', '').replace(']', '').replace(
+        '<h2>About This Game</h2>', '')
+
+    area_reviews = str(soup.find_all(id='game_area_reviews'))
+    if area_reviews == '[]':
+        area_reviews = 'No Reviews at the moment.'
+    else:
+        area_reviews = area_reviews.replace('[', '').replace(']', '').replace(
+            '<h2>Reviews</h2>', '')
+
+    return render(request, 'web/game_info.html',
+                  {'game': game, 'news': news, 'img': imglist, 'description': description,
+                   'area_description': area_description,
+                   'area_reviews': area_reviews})
 
 
 def game(request):
