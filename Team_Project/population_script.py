@@ -18,15 +18,17 @@ def populate():
     # This might seem a little bit confusing, but it allows us to iterate
     # through each data structure, and add the data to our models.
 
-    api_request = requests.get('https://steamspy.com/api.php?request=top100in2weeks')
-    api = json.loads(api_request.content)
+    api = requests.get('https://steamspy.com/api.php?request=top100in2weeks').json()
     for i in api:
-        api_game_request = requests.get('https://steamspy.com/api.php?request=appdetails&appid=' + str(api[i]['appid']))
-        api_game = json.loads(api_game_request.content)
-        for j in api_game['tags'].keys():
-            c = add_cat(j)
-            g = add_game(api[i]['name'], api[i]['appid'])
-            add_tag(g, c)
+        try:
+            api_game = requests.get('https://steamspy.com/api.php?request=appdetails&appid=' + i).json()
+            genre = api_game['genre'].split(', ')
+            for j in genre:
+                c = add_cat(j)
+                g = add_game(api[i]['name'], api[i]['appid'])
+                add_tag(g, c)
+        except json.decoder.JSONDecodeError:
+            continue
 
     videos = [
         {'name': 'Half-Life: Alyx Announcement Trailer',
@@ -37,8 +39,8 @@ def populate():
          'videoId': '_hqgv0pU0EM'},
         {'name': 'Cyberpunk 2077 — Official Cinematic Trailer | E3 2019',
          'videoId': 'LembwKDo1Dk'},
-        {'name':'THE LAST OF US 2 Official Trailer (PS4)',
-         'videoId':'qPNiIeKMHyg'}]
+        {'name': 'THE LAST OF US 2 Official Trailer (PS4)',
+         'videoId': 'qPNiIeKMHyg'}]
 
     for k in videos:
         add_video(k['name'], k['videoId'])

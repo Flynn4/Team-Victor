@@ -96,7 +96,7 @@
 
         </div>
 
-        <div style="float:left; margin-left: 10px; width: 200px">
+        <div style="float:left; margin-left: 10px;">
             <div class="card" style="width: 18rem;">
                 <img src="https://steamcdn-a.akamaihd.net/steam/apps/{{ game.appid }}/library_600x900.jpg"
                      class="card-img-top" alt="...">
@@ -106,6 +106,7 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><a href="https://store.steampowered.com/app/{{ game.appid }}">Steam Store Link</a></li>
+                    <li class="list-group-item">Release Date: {{release_date}}</li>
                     <li class="list-group-item">{{game.developer}}</li>
                     <li class="list-group-item">{{game.genre}}</li>
                 </ul>

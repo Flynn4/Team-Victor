@@ -79,10 +79,14 @@ def game_info(request, id):
         area_reviews = area_reviews.replace('[', '').replace(']', '').replace(
             '<h2>Reviews</h2>', '')
 
+    release_date = str(soup.find_all(class_='date')).replace('[<div class="date">', '').replace('</div>]', '')
+    print(release_date)
+
     return render(request, 'web/game_info.html',
                   {'game': game, 'news': news, 'img': imglist, 'description': description,
                    'area_description': area_description,
-                   'area_reviews': area_reviews})
+                   'area_reviews': area_reviews,
+                   'release_date': release_date})
 
 
 def game(request):
