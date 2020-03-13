@@ -1,4 +1,5 @@
 import os
+import time
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE',
                       'Team_Project.settings')
@@ -18,17 +19,24 @@ def populate():
     # This might seem a little bit confusing, but it allows us to iterate
     # through each data structure, and add the data to our models.
 
-    api = requests.get('https://steamspy.com/api.php?request=top100in2weeks').json()
+    api = requests.get('https://steamspy.com/api.php?request=all').json()
+    count = 0
     for i in api:
-        try:
-            api_game = requests.get('https://steamspy.com/api.php?request=appdetails&appid=' + i).json()
-            genre = api_game['genre'].split(', ')
-            for j in genre:
-                c = add_cat(j)
-                g = add_game(api[i]['name'], api[i]['appid'])
-                add_tag(g, c)
-        except json.decoder.JSONDecodeError:
-            continue
+        if count == 200:
+            print(f"\r Adding Games ... Finish!!", end='', flush=True)
+            break
+        else:
+            try:
+                api_game = requests.get('https://steamspy.com/api.php?request=appdetails&appid=' + i).json()
+                genre = api_game['genre'].split(', ')
+                for j in genre:
+                    c = add_cat(j)
+                    g = add_game(api[i]['name'], api[i]['appid'])
+                    add_tag(g, c)
+                count += 1
+                print(f"\r Adding Games ... [% {count//2}]", end='', flush=True)
+            except json.decoder.JSONDecodeError:
+                continue
 
     videos = [
         {'name': 'Half-Life: Alyx Announcement Trailer',

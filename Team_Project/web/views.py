@@ -22,8 +22,7 @@ def index(request):
     # Show 5 games on home page
     five_games = []
     if len(games) > 0:
-        gamesId = random.sample(range(0, len(games)), 5)
-        for i in gamesId:
+        for i in range(5):
             five_games.append(games[i])
         dict['five_games'] = five_games
 

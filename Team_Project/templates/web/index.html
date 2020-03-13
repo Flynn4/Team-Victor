@@ -45,8 +45,10 @@
             {% for game in games_news %}
                 <div class="col-sm">
                     <div class="card" style="width: 18rem;">
+                    <a href="/game/{{ game.0.appid }}" target="_blank">
                         <img src="https://steamcdn-a.akamaihd.net/steam/apps/{{ game.0.appid }}/header.jpg"
                              class="card-img-top">
+                    </a>
                         <div class="card-body">
                             {% if game.1 == None %}
                                 <a href="https://store.steampowered.com/app/{{ game.0.appid }}" target="_blank">
