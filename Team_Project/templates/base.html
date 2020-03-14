@@ -98,12 +98,27 @@
 
     <div style="float: right">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <form class="form-inline my-2 my-lg-0">
-                {% csrf_token %}
-                <input class="form-control mr-sm-2" name='search' type="search" placeholder="Search"
-                       aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
+
+            <input class="form-control mr-sm-2" id="search" name='search' type="text" placeholder="Search"
+                   aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit" data-toggle="modal"
+                    data-target=".bd-example-modal-sm" onclick="AjaxSendSearch()">Search
+            </button>
+
+
+            <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+                 aria-hidden="true" style="margin-left: -50px">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content" style="text-align: center; width: 400px">
+                        <div style="font-size: 40px;">Searching...</div>
+                        <div class="spinner-border text-info" role="status"
+                             style="margin-left: 180px; margin-bottom: 20px; margin-top: 10px">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
@@ -126,7 +141,7 @@
                         </div>
                         <input id="appid" name="appid" type="text" class="form-control">
                         <button class="btn btn-outline-dark" type="submit" style="margin-left: 10px"
-                                onclick="AjaxSend()">Search
+                                onclick="AjaxSendAppid()">Search
                         </button>
                         <span class="invalid-feedback"></span>
                     </div>
@@ -145,9 +160,9 @@
 </div>
 
 <script>
-    function AjaxSend() {
+    function AjaxSendAppid() {
         $.ajax({
-            url: '{% url 'web:search' %}',
+            url: '{% url 'web:searchappid' %}',
             type: 'POST',
             data: {'appid': $('#appid').val(), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
             success: function (data) {
@@ -162,6 +177,25 @@
             }
         })
     }
+
+    function AjaxSendSearch() {
+        $.ajax({
+            url: '{% url 'web:search' %}',
+            type: 'POST',
+            data: {'search': $('#search').val(), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function (data) {
+                console.log(data);
+                if (data != null) {
+                    location.href = '/search/' + data
+                } else {
+                    $('#appid').addClass('is-invalid')
+                    $('.invalid-feedback').text('Please enter appid number!')
+                }
+
+            }
+        })
+    }
+
 </script>
 
 <!-- Optional JavaScript -->

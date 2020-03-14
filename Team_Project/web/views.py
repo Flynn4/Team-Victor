@@ -7,7 +7,6 @@ from django.shortcuts import render, redirect
 from .models import *
 from bs4 import BeautifulSoup
 import requests
-import json
 import re
 
 
@@ -36,7 +35,8 @@ def index(request):
             if count == 16:
                 break
             else:
-                url = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + str(games[j].appid) + '&count=3&maxlength=300&format=json'
+                url = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + str(
+                    games[j].appid) + '&count=3&maxlength=300&format=json'
                 api_news = requests.get(url).json()
                 if len(api_news['appnews']['newsitems']) > 0:
                     timeStamp = api_news['appnews']['newsitems'][0]['date']
@@ -84,7 +84,6 @@ def game_info(request, id):
             '<h2>Reviews</h2>', '')
 
     release_date = str(soup.find_all(class_='date')).replace('[<div class="date">', '').replace('</div>]', '')
-    print(release_date)
 
     return render(request, 'web/game_info.html',
                   {'game': game, 'news': news, 'img': imglist, 'description': description,
@@ -97,7 +96,31 @@ def game(request):
     return render(request, 'web/game.html')
 
 
+def result(request, search):
+
+    if len(search) > 0:
+        games = Game.objects.filter(name__contains=search)
+        search_result = []
+        for game in games:
+            html = urllib.request.urlopen('https://store.steampowered.com/app/' + str(game.appid)).read()
+            soup = BeautifulSoup(html, 'lxml')
+            description = soup.find(attrs={"name": "Description"})['content']
+            search_result.append((game, description))
+
+        return render(request, 'web/search.html', {'search_result': search_result})
+    else:
+        return HttpResponse('Enter Wrong!')
+
+
 def search(request):
+    search = request.POST['search']
+    if len(search) > 0:
+        return HttpResponse(search)
+    else:
+        return HttpResponse('Enter Wrong!')
+
+
+def searchappid(request):
     appid = request.POST['appid']
     if len(appid) > 0:
         return HttpResponse(appid)

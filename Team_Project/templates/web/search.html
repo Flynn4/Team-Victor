@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<style>
+    .lead {
+        float: left;
+        margin-left: 30px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 700px;
+        height: 65px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+</style>
+
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+    {{ tag }}
+{% endblock %}
+
+{% block content %}
+    {% if search_result %}
+        <div class="container" style="width: 80%">
+            {% for game in search_result %}
+                <div class="jumbotron jumbotron-fluid" style="text-align: left; height: 250px">
+                    <div class="container">
+                        <img src="https://steamcdn-a.akamaihd.net/steam/apps/{{ game.0.appid }}/header.jpg"
+                             style="float: left; width: 25%" class="img-thumbnail">
+                        <a href="/game/{{ game.0.appid }}"><h3 class="display-4"
+                                                               style="margin-left: 30px; float: left">{{ game.0.name }}</h3>
+                        </a>
+                        <p class="lead">{{ game.1 }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="container-fluid">
+        <div class="card bg-dark text-white">
+  <img src="https://steamcdn-a.akamaihd.net/steam/apps/570/library_hero.jpg" class="card-img" alt="...">
+  <div class="card-img-overlay">
+    <h1 class="card-title">No Matches!</h1>
+    <p class="card-text">Sorry there is nothing you can find in the website.</p>
+    <p class="card-text">Try again!</p>
+  </div>
+</div>
+        </div>
+    {% endif %}
+{% endblock %}
+
