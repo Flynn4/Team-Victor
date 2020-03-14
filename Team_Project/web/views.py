@@ -1,6 +1,6 @@
 import datetime
 import random
-import urllib
+import urllib.request
 
 from django.shortcuts import HttpResponse
 from django.shortcuts import render, redirect
@@ -8,6 +8,10 @@ from .models import *
 from bs4 import BeautifulSoup
 import requests
 import re
+
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'
+}
 
 
 # Create your views here.
@@ -66,7 +70,9 @@ def game_info(request, id):
     url1 = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + id + '&count=3&maxlength=300&format=json'
     news = requests.get(url1).json()
 
-    html = urllib.request.urlopen('https://store.steampowered.com/app/' + id).read()
+    url_request = urllib.request.Request('https://store.steampowered.com/app/' + id, headers=headers)
+    response = urllib.request.urlopen(url_request)
+    html = response.read()
     reg = r'https://steamcdn-a.akamaihd.net/steam/apps/' + id + '/ss_.+?.1920x1080.jpg'
     imglist = re.findall(reg, html.decode('utf-8'))
 
@@ -97,12 +103,13 @@ def game(request):
 
 
 def result(request, search):
-
     if len(search) > 0:
         games = Game.objects.filter(name__contains=search)
         search_result = []
         for game in games:
-            html = urllib.request.urlopen('https://store.steampowered.com/app/' + str(game.appid)).read()
+            url_request = urllib.request.Request('https://store.steampowered.com/app/' + str(game.appid), headers=headers)
+            response = urllib.request.urlopen(url_request)
+            html = response.read()
             soup = BeautifulSoup(html, 'lxml')
             description = soup.find(attrs={"name": "Description"})['content']
             search_result.append((game, description))
