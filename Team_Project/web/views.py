@@ -6,6 +6,7 @@ from django.shortcuts import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
 from bs4 import BeautifulSoup
+from slugify import slugify
 import requests
 import re
 
@@ -64,38 +65,56 @@ def index(request):
 
 
 def game_info(request, id):
+    id = id.replace('/', '')
+    game = Game.objects.filter(appid=id)[0]
+
     url = 'https://steamspy.com/api.php?request=appdetails&appid=' + id
-    game = requests.get(url).json()
+    languages = requests.get(url).json()['languages']
+    developer = requests.get(url).json()['developer']
 
-    url1 = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + id + '&count=3&maxlength=300&format=json'
-    news = requests.get(url1).json()
+    url_news = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + id + '&count=3&maxlength=300&format=json'
+    news = requests.get(url_news).json()
 
-    url_request = urllib.request.Request('https://store.steampowered.com/app/' + id, headers=headers)
-    response = urllib.request.urlopen(url_request)
-    html = response.read()
-    reg = r'https://steamcdn-a.akamaihd.net/steam/apps/' + id + '/ss_.+?.1920x1080.jpg'
-    imglist = re.findall(reg, html.decode('utf-8'))
+    # url_request = urllib.request.Request('https://store.steampowered.com/app/' + id, headers=headers)
+    # response = urllib.request.urlopen(url_request)
+    # html = response.read()
+    # reg = r'https://steamcdn-a.akamaihd.net/steam/apps/' + id + '/ss_.+?.1920x1080.jpg'
+    # imglist = re.findall(reg, html.decode('utf-8'))
 
-    soup = BeautifulSoup(html, 'lxml')
-    description = soup.find(attrs={"name": "Description"})['content']
+    url_img = 'https://api.rawg.io/api/games/' + str(game.rawgid) + '/screenshots'
+    img = requests.get(url_img).json()['results']
 
-    area_description = str(soup.find_all(id='game_area_description')).replace('[', '').replace(']', '').replace(
-        '<h2>About This Game</h2>', '')
+    url_game = 'https://api.rawg.io/api/games/' + str(game.rawgid)
+    description = requests.get(url_game).json()['description']
+    released = requests.get(url_game).json()['released']
+    platforms = requests.get(url_game).json()['platforms']
+    genres = requests.get(url_game).json()['genres']
 
-    area_reviews = str(soup.find_all(id='game_area_reviews'))
-    if area_reviews == '[]':
-        area_reviews = 'No Reviews at the moment.'
-    else:
-        area_reviews = area_reviews.replace('[', '').replace(']', '').replace(
-            '<h2>Reviews</h2>', '')
+    # soup = BeautifulSoup(html, 'lxml')
+    # description = soup.find(attrs={"name": "Description"})['content']
 
-    release_date = str(soup.find_all(class_='date')).replace('[<div class="date">', '').replace('</div>]', '')
+    # area_description = str(soup.find_all(id='game_area_description')).replace('[', '').replace(']', '').replace(
+    #     '<h2>About This Game</h2>', '')
+    #
+    # area_reviews = str(soup.find_all(id='game_area_reviews'))
+    # if area_reviews == '[]':
+    #     area_reviews = 'No Reviews at the moment.'
+    # else:
+    #     area_reviews = area_reviews.replace('[', '').replace(']', '').replace(
+    #         '<h2>Reviews</h2>', '')
+    #
+    # release_date = str(soup.find_all(class_='date')).replace('[<div class="date">', '').replace('</div>]', '')
 
     return render(request, 'web/game_info.html',
-                  {'game': game, 'news': news, 'img': imglist, 'description': description,
-                   'area_description': area_description,
-                   'area_reviews': area_reviews,
-                   'release_date': release_date})
+                  {'game': game,
+                   'languages': languages,
+                   'developer': developer,
+                   'news': news,
+                   'img': img,
+                   'description': description,
+                   'released': released,
+                   'platforms': platforms,
+                   'genres': genres,})
 
 
 def game(request):
@@ -107,11 +126,8 @@ def result(request, search):
         games = Game.objects.filter(name__contains=search)
         search_result = []
         for game in games:
-            url_request = urllib.request.Request('https://store.steampowered.com/app/' + str(game.appid), headers=headers)
-            response = urllib.request.urlopen(url_request)
-            html = response.read()
-            soup = BeautifulSoup(html, 'lxml')
-            description = soup.find(attrs={"name": "Description"})['content']
+            url_game = 'https://api.rawg.io/api/games/' + str(game.rawgid)
+            description = requests.get(url_game).json()['description_raw']
             search_result.append((game, description))
 
         return render(request, 'web/search.html', {'search_result': search_result})

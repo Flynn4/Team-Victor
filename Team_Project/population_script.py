@@ -10,6 +10,7 @@ import json
 
 django.setup()
 from web.models import *
+import re
 
 
 def populate():
@@ -19,24 +20,37 @@ def populate():
     # This might seem a little bit confusing, but it allows us to iterate
     # through each data structure, and add the data to our models.
 
-    api = requests.get('https://steamspy.com/api.php?request=all').json()
+    api = requests.get('https://api.rawg.io/api/games').json()
     count = 0
-    for i in api:
-        if count == 200:
-            print(f"\r Adding Games ... Finish!!", end='', flush=True)
-            break
-        else:
-            try:
-                api_game = requests.get('https://steamspy.com/api.php?request=appdetails&appid=' + i).json()
-                genre = api_game['genre'].split(', ')
-                for j in genre:
-                    c = add_cat(j)
-                    g = add_game(api[i]['name'], api[i]['appid'])
-                    add_tag(g, c)
-                count += 1
-                print(f"\r Adding Games ... [% {count//2}]", end='', flush=True)
-            except json.decoder.JSONDecodeError:
-                continue
+
+    while count < 1000:
+        try:
+            for i in api['results']:
+
+                if count == 1000:
+                    print(f"\r Adding Games ... Finish!!", end='', flush=True)
+                    break
+
+                genres = i['genres']
+                stores = i['stores']
+                for j in stores:
+                    if j['store']['name'] == 'Steam':
+                        appid = re.findall('(\d+)', j['url_en'])[0]
+                        g = add_game(i['name'], appid, i['id'])
+
+                        for k in genres:
+                            c = add_cat(k['name'])
+                            add_tag(g, c)
+
+                        count += 1
+                        print(f"\r Adding Games ... [% {count // 10}]", end='', flush=True)
+                        break
+
+            api = requests.get(api['next']).json()
+
+        except json.decoder.JSONDecodeError:
+            continue
+
 
     videos = [
         {'name': 'Half-Life: Alyx Announcement Trailer',
@@ -54,8 +68,8 @@ def populate():
         add_video(k['name'], k['videoId'])
 
 
-def add_game(name, appid):
-    g = Game.objects.get_or_create(name=name, appid=appid)[0]
+def add_game(name, appid, rawgid):
+    g = Game.objects.get_or_create(name=name, appid=appid, rawgid=rawgid)[0]
     g.save()
     return g
 

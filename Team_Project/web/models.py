@@ -19,6 +19,7 @@ class Game(models.Model):
     name = models.CharField(max_length=255)
     likes = models.IntegerField(default=0)
     appid = models.IntegerField(default=0)
+    rawgid = models.IntegerField(default=0)
     game_type = models.ManyToManyField(Category, blank=True, through='Tag')
 
     def __str__(self):

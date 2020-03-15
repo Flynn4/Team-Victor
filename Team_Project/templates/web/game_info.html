@@ -42,19 +42,19 @@
                 </ol>
                 <div class="carousel-inner">
                     <div class="carousel-item active">
-                        <img src="{{ img.0 }}" class="d-block w-100" alt="...">
+                        <img src="{{ img.0.image }}" class="d-block w-100" alt="...">
                     </div>
                     <div class="carousel-item">
-                        <img src="{{ img.1 }}" class="d-block w-100" alt="...">
+                        <img src="{{ img.1.image }}" class="d-block w-100" alt="...">
                     </div>
                     <div class="carousel-item">
-                        <img src="{{ img.2 }}" class="d-block w-100" alt="...">
+                        <img src="{{ img.2.image }}" class="d-block w-100" alt="...">
                     </div>
                     <div class="carousel-item">
-                        <img src="{{ img.3 }}" class="d-block w-100" alt="...">
+                        <img src="{{ img.3.image }}" class="d-block w-100" alt="...">
                     </div>
                     <div class="carousel-item">
-                        <img src="{{ img.4 }}" class="d-block w-100" alt="...">
+                        <img src="{{ img.4.image }}" class="d-block w-100" alt="...">
                     </div>
                 </div>
                 <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
@@ -70,26 +70,33 @@
             <div style="width: 720px; margin-top: 30px">
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab"
-                           aria-controls="home" aria-selected="true">Introduction</a>
+                        <a class="nav-link active" id="description-tab" data-toggle="tab" href="#description" role="tab"
+                           aria-controls="description" aria-selected="true">Introduction</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab"
-                           aria-controls="profile" aria-selected="false">Reviews</a>
+                        <a class="nav-link" id="languages-tab" data-toggle="tab" href="#languages" role="tab"
+                           aria-controls="languages" aria-selected="false">Languages</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab"
-                           aria-controls="contact" aria-selected="false">Languages</a>
+                        <a class="nav-link" id="requirements-tab" data-toggle="tab" href="#requirements" role="tab"
+                           aria-controls="requirements" aria-selected="false">Requirements</a>
                     </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        {{area_description|safe}}
+                    <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="home-tab">
+                        {{description|safe}}
                     </div>
-                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                        {{area_reviews|safe}}
+                    <div class="tab-pane fade" id="languages" role="tabpanel" aria-labelledby="languages-tab">
+                        {{languages}}
                     </div>
-                    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">{{game.languages}}
+                    <div class="tab-pane fade" id="requirements" role="tabpanel" aria-labelledby="requirements-tab">
+                        {% for platform in platforms %}
+                            {% if platform.requirements != null %}
+                                <Strong><p>{{ platform.platform.name }}</p></Strong>
+                            {{ platform.requirements.minimum | safe}}
+                            <br/>
+                            {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -102,13 +109,17 @@
                      class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">{{ game.name }}</h5>
-                    <p class="card-text">{{description}}</p>
+                    <p class="card-text"> </p>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><a href="https://store.steampowered.com/app/{{ game.appid }}">Steam Store Link</a></li>
-                    <li class="list-group-item">Release Date: {{release_date}}</li>
-                    <li class="list-group-item">{{game.developer}}</li>
-                    <li class="list-group-item">{{game.genre}}</li>
+                    <li class="list-group-item">Release Date: {{released}}</li>
+                    <li class="list-group-item">{{developer}}</li>
+                    <li class="list-group-item">
+                        {% for genre in genres %}
+                            {{genre.name}},
+                        {% endfor %}
+                    </li>
                 </ul>
                 <div class="card-body">
                     <a href="#" class="card-link">Like!</a>
