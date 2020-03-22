@@ -5,10 +5,7 @@ import urllib.request
 from django.shortcuts import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
-from bs4 import BeautifulSoup
-from slugify import slugify
 import requests
-import re
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'
@@ -75,11 +72,6 @@ def game_info(request, id):
     url_news = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + id + '&count=3&maxlength=300&format=json'
     news = requests.get(url_news).json()
 
-    # url_request = urllib.request.Request('https://store.steampowered.com/app/' + id, headers=headers)
-    # response = urllib.request.urlopen(url_request)
-    # html = response.read()
-    # reg = r'https://steamcdn-a.akamaihd.net/steam/apps/' + id + '/ss_.+?.1920x1080.jpg'
-    # imglist = re.findall(reg, html.decode('utf-8'))
 
     url_img = 'https://api.rawg.io/api/games/' + str(game.rawgid) + '/screenshots'
     img = requests.get(url_img).json()['results']
@@ -90,20 +82,6 @@ def game_info(request, id):
     platforms = requests.get(url_game).json()['platforms']
     genres = requests.get(url_game).json()['genres']
 
-    # soup = BeautifulSoup(html, 'lxml')
-    # description = soup.find(attrs={"name": "Description"})['content']
-
-    # area_description = str(soup.find_all(id='game_area_description')).replace('[', '').replace(']', '').replace(
-    #     '<h2>About This Game</h2>', '')
-    #
-    # area_reviews = str(soup.find_all(id='game_area_reviews'))
-    # if area_reviews == '[]':
-    #     area_reviews = 'No Reviews at the moment.'
-    # else:
-    #     area_reviews = area_reviews.replace('[', '').replace(']', '').replace(
-    #         '<h2>Reviews</h2>', '')
-    #
-    # release_date = str(soup.find_all(class_='date')).replace('[<div class="date">', '').replace('</div>]', '')
 
     return render(request, 'web/game_info.html',
                   {'game': game,
@@ -140,7 +118,7 @@ def search(request):
     if len(search) > 0:
         return HttpResponse(search)
     else:
-        return HttpResponse('Enter Wrong!')
+        return HttpResponse('Wrong')
 
 
 def searchappid(request):
@@ -153,7 +131,6 @@ def searchappid(request):
 
 
 def category(request, cat):
-    dict = {}
     cat = cat.replace('_', ' ')
     game_name = Tag.objects.filter(category__name=cat).values('game__name')
     game_appid = Tag.objects.filter(category__name=cat).values('game__appid')

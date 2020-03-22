@@ -101,13 +101,12 @@
 
             <input class="form-control mr-sm-2" id="search" name='search' type="text" placeholder="Search"
                    aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit" data-toggle="modal"
+            <button class="btn btn-outline-success my-2 my-sm-0" id="searchButton" type="submit" data-toggle="modal"
                     data-target=".bd-modal-sm" onclick="AjaxSendSearch()">Search
             </button>
 
 
-            <div class="modal fade bd-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
-                 aria-hidden="true" style="margin-left: -50px">
+            <div class="modal fade" id="searchModal" aria-hidden="true" style="margin-left: -50px; z-index: 1060;">
                 <div class="modal-dialog modal-sm" role="document">
                     <div class="modal-content" style="text-align: center; width: 400px">
                         <div style="font-size: 40px;">Searching...</div>
@@ -127,8 +126,7 @@
             style="margin-left: 10px">APP
     </button>
 
-    <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
-         aria-hidden="true">
+    <div class="modal fade bd-example-modal-sm" aria-hidden="true" style="z-index: 1050">
         <div class="modal-dialog modal-sm" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -168,6 +166,7 @@
             success: function (data) {
                 console.log(data);
                 if (data > 0) {
+                    $('#searchModal').modal('show')
                     location.href = '/game/' + data
                 } else {
                     $('#appid').addClass('is-invalid')
@@ -185,11 +184,13 @@
             data: {'search': $('#search').val(), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
             success: function (data) {
                 console.log(data);
-                if (data != null) {
-                    location.href = '/search/' + data
+                if (data == 'Wrong'){
+                    $('#searchModal').modal('hide')
+                    $('#search').addClass('is-invalid')
+                    $('.invalid-feedback').text('Please enter something!')
                 } else {
-                    $('#appid').addClass('is-invalid')
-                    $('.invalid-feedback').text('Please enter appid number!')
+                    $('#searchModal').modal('show')
+                    location.href = '/search/' + data
                 }
 
             }

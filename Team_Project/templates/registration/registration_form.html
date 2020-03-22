@@ -4,7 +4,30 @@
         width: 300px;
         text-align: center;
     }
+    .errors{
+        margin: 0 auto;
+        width: 300px;
+        text-align: center;
+        color: red;
+    }
 </style>
+
+
+<script>
+    function check() {
+        var errormsg = $('.errorlist').text()
+        var username = new RegExp('username')
+        var password = new RegExp('password')
+        if (username.test(errormsg)) {
+            $('#id_username').addClass('is-invalid')
+        } else if (password.test(errormsg)){
+            $('#id_password1').addClass('is-invalid')
+            $('#id_password2').addClass('is-invalid')
+        }
+    }
+
+    window.onload = check;
+</script>
 
 {% extends 'base.html' %}
 {% block title_block %}
@@ -12,7 +35,7 @@
 {% endblock %}
 {% block content %}
     <h1>Register Here</h1>
-    <form method="post" action=".">
+    <form method="post" action="." >
         {% csrf_token %}
         <div class="form-group">
             <label for="inputUsername">Username</label>
@@ -42,6 +65,12 @@
                 Enter the same password as before, for verification.
             </small>
         </div>
+        <div class="errors">
+            {% for error in form.errors.values %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+
         <button type="submit" class="btn btn-primary">Register</button>
     </form>
 {% endblock %}
