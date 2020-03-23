@@ -88,10 +88,12 @@ def game_info(request, id):
     genres = requests.get(url_game).json()['genres']
 
     user = request.user
-    if Like.objects.filter(user=user, game=game).count() > 0:
-        isLike = True
-    else:
-        isLike = False
+    isLike = None
+    if user.is_authenticated:
+        if Like.objects.filter(user=user, game=game).count() > 0:
+            isLike = True
+        else:
+            isLike = False
 
 
     return render(request, 'web/game_info.html',
