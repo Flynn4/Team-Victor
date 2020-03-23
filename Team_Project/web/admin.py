@@ -28,3 +28,9 @@ class VideoAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Video, VideoAdmin)
+
+class LikeAdmin(admin.ModelAdmin):
+    list_display = ['user', 'game']
+
+
+admin.site.register(Like, LikeAdmin)

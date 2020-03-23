@@ -1,7 +1,7 @@
 import datetime
 import random
-import urllib.request
 
+from django.db.models import F
 from django.shortcuts import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
@@ -65,9 +65,14 @@ def game_info(request, id):
     id = id.replace('/', '')
     game = Game.objects.filter(appid=id)[0]
 
-    url = 'https://steamspy.com/api.php?request=appdetails&appid=' + id
-    languages = requests.get(url).json()['languages']
-    developer = requests.get(url).json()['developer']
+    # Can't use in China
+    # url = 'https://steamspy.com/api.php?request=appdetails&appid=' + id
+    # languages = requests.get(url).json()['languages']
+    # developer = requests.get(url).json()['developer']
+
+    url = 'https://store.steampowered.com/api/appdetails/?appids=' + id
+    languages = requests.get(url).json()[id]['data']['supported_languages'].replace('<strong>*</strong>', '')
+    developer = requests.get(url).json()[id]['data']['developers'][0]
 
     url_news = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + id + '&count=3&maxlength=300&format=json'
     news = requests.get(url_news).json()
@@ -82,6 +87,12 @@ def game_info(request, id):
     platforms = requests.get(url_game).json()['platforms']
     genres = requests.get(url_game).json()['genres']
 
+    user = request.user
+    if Like.objects.filter(user=user, game=game).count() > 0:
+        isLike = True
+    else:
+        isLike = False
+
 
     return render(request, 'web/game_info.html',
                   {'game': game,
@@ -92,7 +103,8 @@ def game_info(request, id):
                    'description': description,
                    'released': released,
                    'platforms': platforms,
-                   'genres': genres,})
+                   'genres': genres,
+                   'isLike': isLike})
 
 
 def game(request):
@@ -139,3 +151,15 @@ def category(request, cat):
         games.append((game_appid[i]['game__appid'], game_name[i]['game__name']))
 
     return render(request, 'web/category.html', {'tag': cat, 'games': games})
+
+
+def like(request):
+    appid = request.POST['appid']
+    user = request.user
+    game = Game.objects.filter(appid=appid)[0]
+    if Like.objects.filter(user=user, game=game).count() > 0:
+        Like.objects.filter(user=user, game=game).delete()
+        return HttpResponse('Dislike')
+    else:
+        Like.objects.get_or_create(user=user, game=game)[0].save()
+        return HttpResponse('Like')

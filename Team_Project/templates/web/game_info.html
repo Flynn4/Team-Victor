@@ -15,11 +15,12 @@
         height: 100%;
     }
 
-    .tab-pane{
+    .tab-pane {
         text-align: left;
         margin-top: 5px;
     }
 </style>
+
 
 {% extends 'base.html' %}
 {% load staticfiles %}
@@ -84,17 +85,17 @@
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="home-tab">
-                        {{description|safe}}
+                        {{ description|safe }}
                     </div>
                     <div class="tab-pane fade" id="languages" role="tabpanel" aria-labelledby="languages-tab">
-                        {{languages}}
+                        {{ languages }}
                     </div>
                     <div class="tab-pane fade" id="requirements" role="tabpanel" aria-labelledby="requirements-tab">
                         {% for platform in platforms %}
                             {% if platform.requirements != null %}
                                 <Strong><p>{{ platform.platform.name }}</p></Strong>
-                            {{ platform.requirements.minimum | safe}}
-                            <br/>
+                                {{ platform.requirements.minimum | safe }}
+                                <br/>
                             {% endif %}
                         {% endfor %}
                     </div>
@@ -109,28 +110,64 @@
                      class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">{{ game.name }}</h5>
-                    <p class="card-text"> </p>
+                    <p class="card-text"></p>
                 </div>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><a href="https://store.steampowered.com/app/{{ game.appid }}">Steam Store Link</a></li>
-                    <li class="list-group-item">Release Date: {{released}}</li>
-                    <li class="list-group-item">{{developer}}</li>
+                    <li class="list-group-item"><a href="https://store.steampowered.com/app/{{ game.appid }}">Steam
+                        Store Link</a></li>
+                    <li class="list-group-item">Release Date: {{ released }}</li>
+                    <li class="list-group-item">{{ developer }}</li>
                     <li class="list-group-item">
                         {% for genre in genres %}
-                            {{genre.name}},
+                            {{ genre.name }},
                         {% endfor %}
                     </li>
                 </ul>
-                <div class="card-body">
-                    <a href="#" class="card-link">Like!</a>
-                    <a href="#" class="card-link">Dislike!</a>
-                </div>
+                {% if user.is_authenticated %}
+                    {% if isLike %}
+                        <div class="card-body">
+                            <a href="#" class="card-link">
+                                <button type="button" class="btn btn-outline-danger" id="btn-like"
+                                        onclick="AjaxLike()">Dislike..
+                                </button>
+                            </a>
+                            {# <span style="margin-left: 20px" id="likes">{{ game.likes }}</span>#}
+                        </div>
+                    {% else %}
+                        <div class="card-body">
+                            <a href="#" class="card-link">
+                                <button type="button" class="btn btn-outline-primary" id="btn-like"
+                                        onclick="AjaxLike()">Like!
+                                </button>
+                            </a>
+                            {# <span style="margin-left: 20px" id="likes">{{ game.likes }}</span>#}
+                        </div>
+                    {% endif %}
+                {% endif %}
             </div>
 
         </div>
     </div>
+
+    <script>
+        function AjaxLike() {
+            $.ajax({
+                url: '{% url 'web:like' %}',
+                type: 'POST',
+                data: {'appid': {{ game.appid }}, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                success: function (data) {
+                    console.log(data);
+                    if (data === 'Like') {
+                        {#var val = parseInt($('#likes').text());#}
+                        {#$('#likes').text(val+1)#}
+                        $('#btn-like').attr('class', 'btn btn-outline-danger')
+                        $('#btn-like').text('Dislike..')
+                    } else if (data === 'Dislike') {
+                        $('#btn-like').attr('class', 'btn btn-outline-primary')
+                        $('#btn-like').text('Like!')
+                    }
+                }
+            })
+        }
+    </script>
 {% endblock %}
-
-<script>
-
-</script>

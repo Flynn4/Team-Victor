@@ -10,5 +10,6 @@ urlpatterns = [
     re_path(r'^category/(\S+.)$', views.category, name='category'),
     path('searchappid/', views.searchappid, name='searchappid'),
     re_path(r'^search/(\S+.)$', views.result, name='result'),
-    path('search/', views.search, name='search')
+    path('search/', views.search, name='search'),
+    path('like/', views.like, name='like')
 ]

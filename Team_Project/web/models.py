@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -17,7 +18,6 @@ class Category(models.Model):
 
 class Game(models.Model):
     name = models.CharField(max_length=255)
-    likes = models.IntegerField(default=0)
     appid = models.IntegerField(default=0)
     rawgid = models.IntegerField(default=0)
     game_type = models.ManyToManyField(Category, blank=True, through='Tag')
@@ -43,3 +43,11 @@ class Video(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.username +  '---' + self.game.name
