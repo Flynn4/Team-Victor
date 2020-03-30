@@ -50,4 +50,14 @@ class Like(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.user.username +  '---' + self.game.name
+        return self.user.username + '---' + self.game.name
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    comment = models.TextField(default="")
+    comment_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username + '---' + self.game.name

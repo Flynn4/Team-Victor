@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <style>
     .carousel {
-        width: 720px;
         height: 409px;
         border: 2px solid black;
     }
 
     .carousel-item {
-        width: 720px;
         height: 405px;
     }
 
@@ -16,14 +14,17 @@
     }
 
     .tab-pane {
+        max-height: 500px;
         text-align: left;
         margin-top: 5px;
+        overflow-y: auto;
     }
 </style>
 
 
 {% extends 'base.html' %}
 {% load staticfiles %}
+{% load web_template_tags %}
 
 {% block title %}
     {{ game.name }}
@@ -32,7 +33,7 @@
 {% block content %}
     <div class="container">
 
-        <div style="float: left;">
+        <div style="float: left; width: 720px;">
             <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
                 <ol class="carousel-indicators">
                     <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
@@ -68,7 +69,7 @@
                 </a>
             </div>
 
-            <div style="width: 720px; margin-top: 30px">
+            <div style="margin-top: 30px; margin-bottom: 30px">
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link active" id="description-tab" data-toggle="tab" href="#description" role="tab"
@@ -88,7 +89,7 @@
                         {{ description|safe }}
                     </div>
                     <div class="tab-pane fade" id="languages" role="tabpanel" aria-labelledby="languages-tab">
-                        {{ languages }}
+                        {{ languages | safe }}
                     </div>
                     <div class="tab-pane fade" id="requirements" role="tabpanel" aria-labelledby="requirements-tab">
                         {% for platform in platforms %}
@@ -102,6 +103,55 @@
                 </div>
             </div>
 
+
+            <div id="user-comments">
+                {% for comment in comments %}
+                    {% if forloop.counter0 < 5 %}
+                        <div class="card" style="margin-top: 20px; text-align: left">
+                            <div class="card-header" style="height: 30px; line-height: 0px">
+                                {{ comment.user.username }}
+                            </div>
+                            <div class="card-body">
+                                <blockquote class="blockquote mb-0">
+                                    <p>{{ comment.comment }}</p>
+                                    <footer class="blockquote-footer">Commented at {{ comment.comment_time }} </footer>
+                                </blockquote>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            {% if user.is_authenticated %}
+                {% if isComment %}
+                    <div style="margin-top: 50px; text-align: left" class="form-group">
+                    <span class="badge badge-pill badge-light"
+                          style="font-size: 16px">{{ user.username }}</span>
+                    </div>
+                    <a type="button" class="btn btn-outline-primary btn-lg btn-block disabled"
+                       style="height: 30px; line-height: 10px">You've already commented twice!
+                    </a>
+                {% else %}
+                    <div style="margin-top: 50px; text-align: left" class="form-group">
+                    <span class="badge badge-pill badge-light"
+                          style="margin-bottom: 10px; font-size: 16px">{{ user.username }}</span>
+                        <textarea class="form-control was-validated" id="commentArea" rows="3"
+                                  placeholder="Add your comments here..." required></textarea>
+                        <span class="invalid-feedback"></span>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-lg btn-block"
+                            style="height: 30px; line-height: 0px" id="btn-comment" onclick="AjaxComment()">Submit your
+                        comment
+                    </button>
+                {% endif %}
+            {% else %}
+                <div class="card" style="margin-top: 50px">
+                    <div class="card-body">
+                        <a href="#" data-toggle="modal"
+                 data-target="#staticBackdrop" style="cursor: pointer">Log in</a> to comment
+                    </div>
+                </div>
+            {% endif %}
         </div>
 
         <div style="float:left; margin-left: 10px;">
@@ -146,7 +196,24 @@
                 {% endif %}
             </div>
 
+            <h5 style="margin-top: 40px">Related News</h5>
+            {% for new in news %}
+                {% if forloop.counter0 < 5 %}
+                    <div class="card" style="max-width: 18rem; margin-top: 20px">
+                        <div class="card-body">
+                            <a href="{{ new.url }}" target="_blank">
+                                <p class="card-text">{{ new.title }}</p>
+                            </a>
+                            <p class="card-text"><small class="text-muted">Updated
+                                on {{ new.date | timeconvert }}</small></p>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <div style="margin-top: 100px"></div>
+
         </div>
+
     </div>
 
     <script>
@@ -168,6 +235,59 @@
                     }
                 }
             })
+        }
+
+        function AjaxComment() {
+            if ($('#commentArea').val() === "") {
+                $('#commentArea').addClass('is-invalid')
+                $('.form-group').addClass('was-validated')
+                $('.invalid-feedback').text('Please enter something!')
+            } else {
+                var comment = $('#commentArea').val()
+                var date = new Date();
+                var html = "<div class=\"card\" style=\"margin-top: 20px; text-align: left\">\n" +
+                    "                        <div class=\"card-header\" style=\"height: 30px; line-height: 0px\">\n" +
+                    "                            {{ user.username }}\n" +
+                    "                        </div>\n" +
+                    "                        <div class=\"card-body\">\n" +
+                    "                            <blockquote class=\"blockquote mb-0\">\n" +
+                    "                                <p>" + comment + "</p>\n" +
+                    "                                <footer class=\"blockquote-footer\">Commented at " + date.toLocaleString() + " </footer>\n" +
+                    "                            </blockquote>\n" +
+                    "                        </div>\n" +
+                    "                    </div>"
+                $.ajax({
+                    url: '{% url 'web:comment' %}',
+                    type: 'POST',
+                    data: {
+                        'appid': {{ game.appid }},
+                        'comment': comment,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        if (data === 'OK') {
+                            $('#user-comments').prepend(html)
+                        } else if (data === 'ALREADY COMMENT TWICE') {
+                            $('#user-comments').prepend(html)
+                            $('#commentArea').remove()
+                            $('#btn-comment').remove()
+                            $('.form-group').after("<a type=\"button\" class=\"btn btn-outline-primary btn-lg btn-block disabled\"\n" +
+                                "                       style=\"height: 30px; line-height: 10px; margin-top: -10px\">You've already commented twice!\n" +
+                                "                    </a>")
+                        } else {
+                            $('#commentArea').remove()
+                            $('#btn-comment').remove()
+                            $('.form-group').after("<a type=\"button\" class=\"btn btn-outline-primary btn-lg btn-block disabled\"\n" +
+                                "                       style=\"height: 30px; line-height: 10px; margin-top: -10px\">You've already commented twice!\n" +
+                                "                    </a>")
+
+                        }
+
+                    }
+                })
+            }
+
         }
     </script>
 {% endblock %}

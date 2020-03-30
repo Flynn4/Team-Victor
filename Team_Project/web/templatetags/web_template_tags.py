@@ -1,4 +1,5 @@
 import re
+import datetime
 
 from django import template
 from django.template.defaultfilters import stringfilter
@@ -22,5 +23,14 @@ def spacify(value, autoescape=None):
     else:
         esc = lambda x: x
     return mark_safe(re.sub('\s', '_', esc(value)))
+
+
 spacify.needs_autoescape = True
 register.filter(spacify)
+
+
+@register.filter
+def timeconvert(t):
+    dateArray = datetime.datetime.fromtimestamp(t)
+    otherStyleTime = dateArray.strftime("%d %b %Y")
+    return otherStyleTime

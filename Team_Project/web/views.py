@@ -38,14 +38,10 @@ def index(request):
                 break
             else:
                 url = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + str(
-                    games[j].appid) + '&count=3&maxlength=300&format=json'
-                api_news = requests.get(url).json()
-                if len(api_news['appnews']['newsitems']) > 0:
-                    timeStamp = api_news['appnews']['newsitems'][0]['date']
-                    dateArray = datetime.datetime.fromtimestamp(timeStamp)
-                    otherStyleTime = dateArray.strftime("%d %b %Y")
-                    api_news['appnews']['newsitems'][0]['date'] = otherStyleTime
-                    games_news.append(api_news['appnews']['newsitems'][0])
+                    games[j].appid) + '&count=1&maxlength=100&format=json'
+                api_news = requests.get(url).json()['appnews']['newsitems']
+                if len(api_news) > 0:
+                    games_news.append(api_news[0])
                     count += 1
                 else:
                     continue
@@ -66,17 +62,16 @@ def game_info(request, id):
     game = Game.objects.filter(appid=id)[0]
 
     # Can't use in China
-    url = 'https://steamspy.com/api.php?request=appdetails&appid=' + id
-    languages = requests.get(url).json()['languages']
-    developer = requests.get(url).json()['developer']
+    # url = 'https://steamspy.com/api.php?request=appdetails&appid=' + id
+    # languages = requests.get(url).json()['languages']
+    # developer = requests.get(url).json()['developer']
 
-    # url = 'https://store.steampowered.com/api/appdetails/?appids=' + id
-    # languages = requests.get(url).json()[id]['data']['supported_languages'].replace('<strong>*</strong>', '')
-    # developer = requests.get(url).json()[id]['data']['developers'][0]
+    url = 'https://store.steampowered.com/api/appdetails/?appids=' + id
+    languages = requests.get(url).json()[id]['data']['supported_languages'].replace('<strong>*</strong>', '')
+    developer = requests.get(url).json()[id]['data']['developers'][0]
 
-    url_news = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + id + '&count=3&maxlength=300&format=json'
-    news = requests.get(url_news).json()
-
+    url_news = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + id + '&count=10&maxlength=100&format=json'
+    news = requests.get(url_news).json()['appnews']['newsitems']
 
     url_img = 'https://api.rawg.io/api/games/' + str(game.rawgid) + '/screenshots'
     img = requests.get(url_img).json()['results']
@@ -95,6 +90,17 @@ def game_info(request, id):
         else:
             isLike = False
 
+    if len(Comment.objects.filter(game=game)) > 0:
+        comments = Comment.objects.filter(game=game).order_by('-comment_time')
+    else:
+        comments = None
+
+    isComment = None
+    if user.is_authenticated:
+        if Comment.objects.filter(user=user, game=game).count() > 1:
+            isComment = True
+        else:
+            isComment = False
 
     return render(request, 'web/game_info.html',
                   {'game': game,
@@ -106,11 +112,13 @@ def game_info(request, id):
                    'released': released,
                    'platforms': platforms,
                    'genres': genres,
-                   'isLike': isLike})
+                   'isLike': isLike,
+                   'isComment': isComment,
+                   'comments': comments})
 
 
 def game(request):
-    return render(request, 'web/game.html')
+    return render(request, 'web/index.html')
 
 
 def result(request, search):
@@ -165,3 +173,18 @@ def like(request):
     else:
         Like.objects.get_or_create(user=user, game=game)[0].save()
         return HttpResponse('Like')
+
+
+def comment(request):
+    appid = request.POST['appid']
+    comment = request.POST['comment']
+    user = request.user
+    game = Game.objects.filter(appid=appid)[0]
+    if Comment.objects.filter(user=user, game=game).count() == 1:
+        Comment.objects.create(user=user, game=game, comment=comment)
+        return HttpResponse('ALREADY COMMENT TWICE')
+    elif Comment.objects.filter(user=user, game=game).count() > 1:
+        return HttpResponse('NO')
+    else:
+        Comment.objects.create(user=user, game=game, comment=comment)
+        return HttpResponse('OK')

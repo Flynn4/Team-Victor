@@ -13,6 +13,7 @@
 </style>
 {% extends 'base.html' %}
 {% load staticfiles %}
+{% load web_template_tags %}
 
 {% block title %}
     Home page
@@ -55,7 +56,7 @@
                             </a>
                         </div>
                         <div class="card-footer">
-                            <small class="text-muted">Updated on {{ news.date }}</small>
+                            <small class="text-muted">Updated on {{ news.date|timeconvert }}</small>
                         </div>
                     </div>
                 </div>

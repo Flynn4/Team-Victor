@@ -66,9 +66,7 @@
 		subject=Hello&body=FromGCRITIC" id="navbarContact">Contact</a>
             </li>
         </ul>
-
     </nav>
-
     <nav class="navbar-logo" style="margin-right: 17%">
         <a class="navbar-brand" href="{% url 'web:index' %}">
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRRvYB2Gs3hJ8mOG28GDrHtRs-EdlzHo0nb6CYyWY2RcnofkVE1"
@@ -85,36 +83,87 @@
           <span class="navbar-text">
             Hello! {{ user.username }}
           </span>
-            <a href="{% url 'auth_logout' %}" id="navbarLogout" style="margin-left: 20px">
-        <span class="navbar-text">
+            <a href="{% url 'auth_logout' %}?next={{ request.path }}">
+            <span class="navbar-text" id="navbarLogout" style="margin-left: 20px; cursor: pointer" data-toggle="modal"
+                  data-target="#logoutModal">
             Logout</span></a>
+
+            <!-- Modal -->
+            <div class="modal fade" id="logoutModal" aria-hidden="true" style="margin-left: -50px; z-index: 1060;">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content" style="text-align: center; width: 400px">
+                    <div style="font-size: 40px;">Signing out...</div>
+                    <div class="spinner-border text-info" role="status"
+                         style="margin-left: 180px; margin-bottom: 20px; margin-top: 10px">
+                    </div>
+                </div>
+            </div>
+
+        </div>
         </nav>
     {% else %}
         <nav class="navbar-user">
-            <a class="navbar-brand" href="{% url 'auth_login' %}" style="margin-left: 100px">
-                <img src="{% static 'images/user-icon.png' %}" width="30" height="30" alt="">
-            </a>
+            {#            <a class="navbar-brand" href="{% url 'auth_login' %}" style="margin-left: 100px">#}
+            <img src="{% static 'images/user-icon.png' %}" width="30" height="30" data-toggle="modal"
+                 data-target="#staticBackdrop" style="cursor: pointer">
+            {#            </a>#}
         </nav>
+
+        <!-- Modal -->
+        <div class="modal fade" id="staticBackdrop" data-backdrop="static" tabindex="-1" role="dialog"
+             aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document" style="width: 400px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Log in</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" style="text-align: center;">
+                        <form method="post" action="{% url 'auth_login' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="inputUsername">Username</label>
+                                <input type="text" name="username" id="id_username" class="form-control"
+                                       placeholder="Username" required autofocus>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">Password</label>
+                                <input type="password" name="password" id="id_password" class="form-control"
+                                       placeholder="Password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Log in</button>
+                            <input type="hidden" name="next" value="{{ request.path }}"/>
+                        </form>
+                        <p style="margin-top: 30px">
+                            Not registered?
+                            <a href="{% url 'registration_register' %}">Register here!</a>
+                        </p>
+                        <a href="{% url 'social:begin' 'github' %}">Login with GitHub</a><br>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endif %}
 
     <div style="float: right">
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="collapse navbar-collapse" id="navbarSearch">
 
-            <input class="form-control mr-sm-2" id="search" name='search' type="text" placeholder="Search"
-                   aria-label="Search">
+            <input class="form-control mr-sm-2" id="search" name='search' type="text" placeholder="Dota"
+                   aria-label="Search" required>
             <button class="btn btn-outline-success my-2 my-sm-0" id="searchButton" type="submit" data-toggle="modal"
                     data-target=".bd-modal-sm" onclick="AjaxSendSearch()">Search
             </button>
+        </div>
 
-
-            <div class="modal fade" id="searchModal" aria-hidden="true" style="margin-left: -50px; z-index: 1060;">
-                <div class="modal-dialog modal-sm" role="document">
-                    <div class="modal-content" style="text-align: center; width: 400px">
-                        <div style="font-size: 40px;">Searching...</div>
-                        <div class="spinner-border text-info" role="status"
-                             style="margin-left: 180px; margin-bottom: 20px; margin-top: 10px">
-                            <span class="sr-only">Loading...</span>
-                        </div>
+        <div class="modal fade" id="searchModal" aria-hidden="true" style="margin-left: -50px; z-index: 1060;">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content" style="text-align: center; width: 400px">
+                    <div style="font-size: 40px;">Searching...</div>
+                    <div class="spinner-border text-info" role="status"
+                         style="margin-left: 180px; margin-bottom: 20px; margin-top: 10px">
+                        <span class="sr-only">Loading...</span>
                     </div>
                 </div>
             </div>
@@ -138,7 +187,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">APP</span>
                         </div>
-                        <input id="appid" name="appid" type="text" class="form-control">
+                        <input id="appid" name="appid" type="text" class="form-control" required>
                         <button class="btn btn-outline-dark" type="submit" style="margin-left: 10px"
                                 onclick="AjaxSendAppid()">Search
                         </button>
@@ -171,6 +220,7 @@
                     location.href = '/game/' + data
                 } else {
                     $('#appid').addClass('is-invalid')
+                    $('.input-group').addClass('was-validated')
                     $('.invalid-feedback').text('Please enter appid number!')
                 }
 
@@ -185,9 +235,10 @@
             data: {'search': $('#search').val(), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
             success: function (data) {
                 console.log(data);
-                if (data == 'Wrong'){
+                if (data == 'Wrong') {
                     $('#searchModal').modal('hide')
                     $('#search').addClass('is-invalid')
+                    $('#navbarSearch').addClass('was-validated')
                     $('.invalid-feedback').text('Please enter something!')
                 } else {
                     $('#searchModal').modal('show')
