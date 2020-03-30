@@ -79,12 +79,12 @@
 
     <!-- User Part -->
     {% if user.is_authenticated %}
-        <nav class="navbar-user">
-          <span class="navbar-text">
+        <nav class="navbar-user" style="display: inline">
+          <span class="navbar-text" >
             Hello! {{ user.username }}
           </span>
             <a href="{% url 'auth_logout' %}?next={{ request.path }}">
-            <span class="navbar-text" id="navbarLogout" style="margin-left: 20px; cursor: pointer" data-toggle="modal"
+            <span class="navbar-text" id="navbarLogout" style="margin-left: 20px; cursor: pointer;" data-toggle="modal"
                   data-target="#logoutModal">
             Logout</span></a>
 

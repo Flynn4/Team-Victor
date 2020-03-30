@@ -33,7 +33,7 @@
 {% block content %}
     <div class="container">
 
-        <div style="float: left; width: 720px;">
+        <div class="game info and comment" style="float: left; width: 720px;">
             <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
                 <ol class="carousel-indicators">
                     <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
@@ -117,6 +117,7 @@
                                     <footer class="blockquote-footer">Commented at {{ comment.comment_time }} </footer>
                                 </blockquote>
                             </div>
+
                         </div>
                     {% endif %}
                 {% endfor %}
@@ -154,7 +155,7 @@
             {% endif %}
         </div>
 
-        <div style="float:left; margin-left: 10px;">
+        <div class="" style="float:left; margin-left: 10px;">
             <div class="card" style="width: 18rem;">
                 <img src="https://steamcdn-a.akamaihd.net/steam/apps/{{ game.appid }}/library_600x900.jpg"
                      class="card-img-top" alt="...">
