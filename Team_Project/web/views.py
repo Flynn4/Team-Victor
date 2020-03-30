@@ -39,9 +39,9 @@ def index(request):
             else:
                 url = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + str(
                     games[j].appid) + '&count=1&maxlength=100&format=json'
-                api_news = requests.get(url).json()['appnews']['newsitems']
-                if len(api_news) > 0:
-                    games_news.append(api_news[0])
+                api_news = requests.get(url).json()
+                if api_news['appnews']['count'] > 0:
+                    games_news.append(api_news['appnews']['newsitems'][0])
                     count += 1
                 else:
                     continue

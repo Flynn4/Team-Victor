@@ -225,8 +225,6 @@
                 success: function (data) {
                     console.log(data);
                     if (data === 'Like') {
-                        {#var val = parseInt($('#likes').text());#}
-                        {#$('#likes').text(val+1)#}
                         $('#btn-like').attr('class', 'btn btn-outline-danger')
                         $('#btn-like').text('Dislike..')
                     } else if (data === 'Dislike') {
