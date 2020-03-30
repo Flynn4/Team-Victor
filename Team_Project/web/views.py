@@ -30,8 +30,8 @@ def index(request):
 
     # Show 16 games and news on home page
     games_news = []
-    gamesId = random.sample(range(0, len(games)), 50)
     if len(games) > 0:
+        gamesId = random.sample(range(0, len(games)), 50)
         count = 0
         for j in gamesId:
             if count == 16:
