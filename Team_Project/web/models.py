@@ -20,7 +20,7 @@ class Game(models.Model):
     name = models.CharField(max_length=255)
     appid = models.IntegerField(default=0)
     rawgid = models.IntegerField(default=0)
-    game_type = models.ManyToManyField(Category,  null=True, blank=True, default=None, through='Tag')
+    game_type = models.ManyToManyField(Category, blank=True, through='Tag')
 
     def __str__(self):
         return self.name
