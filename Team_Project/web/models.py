@@ -20,7 +20,7 @@ class Game(models.Model):
     name = models.CharField(max_length=255)
     appid = models.IntegerField(default=0)
     rawgid = models.IntegerField(default=0)
-    game_type = models.ManyToManyField(Category, blank=True, through='Tag')
+    game_type = models.ManyToManyField(Category,  null=True, blank=True, default=None, through='Tag')
 
     def __str__(self):
         return self.name
@@ -30,8 +30,8 @@ class Game(models.Model):
 
 
 class Tag(models.Model):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, null=True, blank=True, default=None, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, null=True, blank=True, default=None, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'game_tag'
