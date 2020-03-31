@@ -18,6 +18,7 @@ class WebPageTest(TestCase):
     def test_search_game(self):
         response = self.client.get('/search/dota')
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Results')
 
     def test_category(self):
         response = self.client.get('/category/action')
