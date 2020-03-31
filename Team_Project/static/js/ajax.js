@@ -1,42 +1,60 @@
 function AjaxSendAppid() {
-    $.ajax({
-        url: searchappid,
-        type: 'POST',
-        data: {'appid': $('#appid').val(), 'csrfmiddlewaretoken': csrf_token},
-        success: function (data) {
-            console.log(data);
-            if (data > 0) {
-                $('#searchModal').modal('show')
-                location.href = '/game/' + data
-            } else {
-                $('#appid').addClass('is-invalid')
-                $('.input-group').addClass('was-validated')
-                $('.invalid-feedback').text('Please enter appid number!')
-            }
+    if ($('#appid').val() === "") {
+        $('#appid').addClass('is-invalid')
+        $('.input-group').addClass('was-validated')
+        $('.invalid-feedback').text('Please enter appid number!')
+    } else {
+        var appid = $('#appid').val();
+        $.ajax({
+            url: searchappid,
+            type: 'POST',
+            data: {'appid': appid, 'csrfmiddlewaretoken': csrf_token},
+            success: function (data) {
+                console.log(data);
+                if (data === 'OK') {
+                    $('#searchModal').modal('show')
+                    location.href = '/game/' + appid
+                } else if (data === 'Game Not Found') {
+                    $('.input-group').removeClass('was-validated')
+                    $('#appid').addClass('is-invalid')
+                    $('.invalid-feedback').text('Game not found in database!')
+                } else {
+                    $('.input-group').removeClass('was-validated')
+                    $('#appid').addClass('is-invalid')
+                    $('.invalid-feedback').text('Please enter an invalid appid number!')
+                }
 
-        }
-    })
+            }
+        });
+    }
 }
 
 function AjaxSendSearch() {
-    $.ajax({
-        url: search,
-        type: 'POST',
-        data: {'search': $('#search').val(), 'csrfmiddlewaretoken': csrf_token},
-        success: function (data) {
-            console.log(data);
-            if (data == 'Wrong') {
-                $('#searchModal').modal('hide')
-                $('#search').addClass('is-invalid')
-                $('#navbarSearch').addClass('was-validated')
-                $('.invalid-feedback').text('Please enter something!')
-            } else {
-                $('#searchModal').modal('show')
-                location.href = '/search/' + data
-            }
+    if ($('#search').val() === "") {
+        $('#searchModal').modal('hide')
+        $('#search').addClass('is-invalid')
+        $('#navbarSearch').addClass('was-validated')
+    } else {
+        $.ajax({
+            url: search,
+            type: 'POST',
+            data: {'search': $('#search').val(), 'csrfmiddlewaretoken': csrf_token},
+            success: function (data) {
+                console.log(data);
+                if (data === 'Wrong') {
+                    $('#searchModal').modal('hide')
+                    $('#search').addClass('is-invalid')
+                    $('#navbarSearch').addClass('was-validated')
+                    $('.invalid-feedback').text('Please enter something!')
+                } else {
+                    $('#searchModal').modal('show')
+                    location.href = '/search/' + data
+                }
 
-        }
-    })
+            }
+        });
+    }
+
 }
 
 function AjaxLike() {

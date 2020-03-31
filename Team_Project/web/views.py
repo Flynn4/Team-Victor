@@ -60,14 +60,14 @@ def game_info(request, id):
     id = id.replace('/', '')
     game = Game.objects.filter(appid=id)[0]
 
-    url = 'https://steamspy.com/api.php?request=appdetails&appid=' + id
-    languages = requests.get(url).json()['languages']
-    developer = requests.get(url).json()['developer']
+    # url = 'https://steamspy.com/api.php?request=appdetails&appid=' + id
+    # languages = requests.get(url).json()['languages']
+    # developer = requests.get(url).json()['developer']
 
     # These part are used when develop in China
-    # url = 'https://store.steampowered.com/api/appdetails/?appids=' + id
-    # languages = requests.get(url).json()[id]['data']['supported_languages'].replace('<strong>*</strong>', '')
-    # developer = requests.get(url).json()[id]['data']['developers'][0]
+    url = 'https://store.steampowered.com/api/appdetails/?appids=' + id
+    languages = requests.get(url).json()[id]['data']['supported_languages'].replace('<strong>*</strong>', '')
+    developer = requests.get(url).json()[id]['data']['developers'][0]
 
     # Get game news from api
     url_news = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + id + '&count=10&maxlength=100&format=json'
@@ -151,16 +151,19 @@ def search(request):
     if search is not None:
         return HttpResponse(search)
     else:
-        return HttpResponse('Wrong')
+        return render(request, 'web/search.html')
 
 
 def searchappid(request):
     # Ajax for search appid part
-    appid = request.POST.get('appid')
-    if appid is not None:
-        return HttpResponse(appid)
-    else:
-        return HttpResponse('Enter Wrong!')
+    try:
+        appid = int(request.POST.get('appid'))
+        if Game.objects.filter(appid=appid).count() > 0:
+            return HttpResponse('OK')
+        else:
+            return HttpResponse('Game Not Found')
+    except ValueError as ve:
+        return HttpResponse('Enter Wrong')
 
 
 def category(request, cat):
