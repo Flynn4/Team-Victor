@@ -90,16 +90,16 @@
 
             <!-- Modal -->
             <div class="modal fade" id="logoutModal" aria-hidden="true" style="margin-left: -50px; z-index: 1060;">
-            <div class="modal-dialog modal-sm" role="document">
-                <div class="modal-content" style="text-align: center; width: 400px">
-                    <div style="font-size: 40px;">Signing out...</div>
-                    <div class="spinner-border text-info" role="status"
-                         style="margin-left: 180px; margin-bottom: 20px; margin-top: 10px">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content" style="text-align: center; width: 400px">
+                        <div style="font-size: 40px;">Signing out...</div>
+                        <div class="spinner-border text-info" role="status"
+                             style="margin-left: 180px; margin-bottom: 20px; margin-top: 10px">
+                        </div>
                     </div>
                 </div>
-            </div>
 
-        </div>
+            </div>
         </nav>
     {% else %}
         <nav class="navbar-user">
@@ -208,51 +208,11 @@
 </div>
 
 <script>
-    function AjaxSendAppid() {
-        $.ajax({
-            url: '{% url 'web:searchappid' %}',
-            type: 'POST',
-            data: {'appid': $('#appid').val(), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
-            success: function (data) {
-                console.log(data);
-                if (data > 0) {
-                    $('#searchModal').modal('show')
-                    location.href = '/game/' + data
-                } else {
-                    $('#appid').addClass('is-invalid')
-                    $('.input-group').addClass('was-validated')
-                    $('.invalid-feedback').text('Please enter appid number!')
-                }
-
-            }
-        })
-    }
-
-    function AjaxSendSearch() {
-        $.ajax({
-            url: '{% url 'web:search' %}',
-            type: 'POST',
-            data: {'search': $('#search').val(), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
-            success: function (data) {
-                console.log(data);
-                if (data == 'Wrong') {
-                    $('#searchModal').modal('hide')
-                    $('#search').addClass('is-invalid')
-                    $('#navbarSearch').addClass('was-validated')
-                    $('.invalid-feedback').text('Please enter something!')
-                } else {
-                    $('#searchModal').modal('show')
-                    location.href = '/search/' + data
-                }
-
-            }
-        })
-    }
-
+    var searchappid = {% url 'web:searchappid' %};
+    var search = {% url 'web:search' %};
+    var csrf_token = '{{ csrf_token }}';
 </script>
-
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="{% static 'js/ajax.js' %}"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>

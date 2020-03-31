@@ -1,7 +1,5 @@
-import datetime
 import random
 
-from django.db.models import F
 from django.shortcuts import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
@@ -21,7 +19,7 @@ def index(request):
     # Already used in template tags
     # dict['categories'] = Category.objects.filter(tag__game_id__lt=2)
 
-    # Show 5 games on home page
+    # Show top 5 games on home page
     five_games = []
     if len(games) > 0:
         for i in range(5):
@@ -58,6 +56,7 @@ def index(request):
 
 
 def game_info(request, id):
+    # Get id from url
     id = id.replace('/', '')
     game = Game.objects.filter(appid=id)[0]
 
@@ -70,19 +69,24 @@ def game_info(request, id):
     # languages = requests.get(url).json()[id]['data']['supported_languages'].replace('<strong>*</strong>', '')
     # developer = requests.get(url).json()[id]['data']['developers'][0]
 
+    # Get game news from api
     url_news = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + id + '&count=10&maxlength=100&format=json'
     news = requests.get(url_news).json()['appnews']['newsitems']
 
+    # Get game screenshots (image link) from api
     url_img = 'https://api.rawg.io/api/games/' + str(game.rawgid) + '/screenshots'
     img = requests.get(url_img).json()['results']
 
+    # Get game details from api
     url_game = 'https://api.rawg.io/api/games/' + str(game.rawgid)
     description = requests.get(url_game).json()['description']
     released = requests.get(url_game).json()['released']
     platforms = requests.get(url_game).json()['platforms']
     genres = requests.get(url_game).json()['genres']
 
+    # Get current login user
     user = request.user
+    # Check if current user like this game, and show on web page
     isLike = None
     if user.is_authenticated:
         if Like.objects.filter(user=user, game=game).count() > 0:
@@ -90,17 +94,19 @@ def game_info(request, id):
         else:
             isLike = False
 
-    if len(Comment.objects.filter(game=game)) > 0:
-        comments = Comment.objects.filter(game=game).order_by('-comment_time')
-    else:
-        comments = None
-
+    # Check if user already comment twice
     isComment = None
     if user.is_authenticated:
         if Comment.objects.filter(user=user, game=game).count() > 1:
             isComment = True
         else:
             isComment = False
+
+    # Get all comments of the game from database
+    if len(Comment.objects.filter(game=game)) > 0:
+        comments = Comment.objects.filter(game=game).order_by('-comment_time')
+    else:
+        comments = None
 
     return render(request, 'web/game_info.html',
                   {'game': game,
@@ -118,10 +124,13 @@ def game_info(request, id):
 
 
 def game(request):
+    # /game did not show anything and return to index page
     return render(request, 'web/index.html')
 
 
 def result(request, search):
+    # Get details from url and check
+    # if url return anything than search database
     if len(search) > 0:
         games = Game.objects.filter(name__contains=search)
         search_result = []
@@ -136,6 +145,7 @@ def result(request, search):
 
 
 def search(request):
+    # Ajax for search part
     search = request.POST['search']
     if len(search) > 0:
         return HttpResponse(search)
@@ -144,15 +154,16 @@ def search(request):
 
 
 def searchappid(request):
+    # Ajax for search appid part
     appid = request.POST['appid']
     if len(appid) > 0:
         return HttpResponse(appid)
-        # return redirect('/game/' + search)
     else:
         return HttpResponse('Enter Wrong!')
 
 
 def category(request, cat):
+    # Show all games in category
     cat = cat.replace('_', ' ')
     game_name = Tag.objects.filter(category__name=cat).values('game__name')
     game_appid = Tag.objects.filter(category__name=cat).values('game__appid')
@@ -164,6 +175,7 @@ def category(request, cat):
 
 
 def like(request):
+    # Ajax part when user press like
     appid = request.POST['appid']
     user = request.user
     game = Game.objects.filter(appid=appid)[0]
@@ -171,18 +183,23 @@ def like(request):
         Like.objects.filter(user=user, game=game).delete()
         return HttpResponse('Dislike')
     else:
+        # Different from comment, only one like per user
         Like.objects.get_or_create(user=user, game=game)[0].save()
         return HttpResponse('Like')
 
 
 def comment(request):
+    # Ajax part when user comment
     appid = request.POST['appid']
     comment = request.POST['comment']
     user = request.user
     game = Game.objects.filter(appid=appid)[0]
+    # If user already comment once, then the second one will be save and return a message
+    # Then the web page will close the comment
     if Comment.objects.filter(user=user, game=game).count() == 1:
         Comment.objects.create(user=user, game=game, comment=comment)
         return HttpResponse('ALREADY COMMENT TWICE')
+    # User can't comment if they already done twice
     elif Comment.objects.filter(user=user, game=game).count() > 1:
         return HttpResponse('NO')
     else:
