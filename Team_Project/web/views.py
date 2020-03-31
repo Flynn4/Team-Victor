@@ -146,8 +146,8 @@ def result(request, search):
 
 def search(request):
     # Ajax for search part
-    search = request.POST['search']
-    if len(search) > 0:
+    search = request.POST.get('search')
+    if search is not None:
         return HttpResponse(search)
     else:
         return HttpResponse('Wrong')
@@ -155,8 +155,8 @@ def search(request):
 
 def searchappid(request):
     # Ajax for search appid part
-    appid = request.POST['appid']
-    if len(appid) > 0:
+    appid = request.POST.get('appid')
+    if appid is not None:
         return HttpResponse(appid)
     else:
         return HttpResponse('Enter Wrong!')
@@ -176,7 +176,7 @@ def category(request, cat):
 
 def like(request):
     # Ajax part when user press like
-    appid = request.POST['appid']
+    appid = request.POST.get('appid')
     user = request.user
     game = Game.objects.filter(appid=appid)[0]
     if Like.objects.filter(user=user, game=game).count() > 0:
@@ -190,8 +190,8 @@ def like(request):
 
 def comment(request):
     # Ajax part when user comment
-    appid = request.POST['appid']
-    comment = request.POST['comment']
+    appid = request.POST.get('appid')
+    comment = request.POST.get('comment')
     user = request.user
     game = Game.objects.filter(appid=appid)[0]
     # If user already comment once, then the second one will be save and return a message
