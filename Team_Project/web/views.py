@@ -60,14 +60,14 @@ def game_info(request, id):
     id = id.replace('/', '')
     game = Game.objects.filter(appid=id)[0]
 
-    # url = 'https://steamspy.com/api.php?request=appdetails&appid=' + id
-    # languages = requests.get(url).json()['languages']
-    # developer = requests.get(url).json()['developer']
+    url = 'https://steamspy.com/api.php?request=appdetails&appid=' + id
+    languages = requests.get(url).json()['languages']
+    developer = requests.get(url).json()['developer']
 
     # These part are used when develop in China
-    url = 'https://store.steampowered.com/api/appdetails/?appids=' + id
-    languages = requests.get(url).json()[id]['data']['supported_languages'].replace('<strong>*</strong>', '')
-    developer = requests.get(url).json()[id]['data']['developers'][0]
+    # url = 'https://store.steampowered.com/api/appdetails/?appids=' + id
+    # languages = requests.get(url).json()[id]['data']['supported_languages'].replace('<strong>*</strong>', '')
+    # developer = requests.get(url).json()[id]['data']['developers'][0]
 
     # Get game news from api
     url_news = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=' + id + '&count=10&maxlength=100&format=json'
