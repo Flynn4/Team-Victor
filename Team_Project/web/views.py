@@ -132,6 +132,7 @@ def result(request, search):
     # Get details from url and check
     # if url return anything than search database
     if len(search) > 0:
+        search = search.replace('%20', '')
         games = Game.objects.filter(name__contains=search)
         search_result = []
         for game in games:
